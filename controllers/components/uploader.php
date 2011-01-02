@@ -232,8 +232,6 @@ class UploaderComponent extends Object {
         if (!is_writable($this->tempDir)) {
             $this->Folder->chmod($this->tempDir, 0777, false);
         }
-
-        $this->_directory();
     }
 
     /**
