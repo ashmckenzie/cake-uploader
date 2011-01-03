@@ -202,7 +202,8 @@ class AttachmentBehavior extends ModelBehavior {
                                         return false;
                                     }
 
-                                    if ($path = $this->Uploader->$method($options)) {
+                                    if (($path = $this->Uploader->$method($options))) {
+
                                         if ($s3) {
                                             $path = $this->S3Transfer->transfer($path);
                                         }
@@ -210,8 +211,12 @@ class AttachmentBehavior extends ModelBehavior {
                                         $Model->data[$Model->alias][$options['dbColumn']] = $path;
                                         $this->__attached[$file][$options['dbColumn']] = $path;
 
-                                        // Delete original if same column name
-                                        if ($options['dbColumn'] == $attachment['dbColumn']) {
+                                        // Delete original if same column name and are not the same file
+                                        // which can happen if 'append' => '' is defined in the options
+                                        if (
+                                          $options['dbColumn'] == $attachment['dbColumn'] &&
+                                          $basePath != $Model->data[$Model->alias][$attachment['dbColumn']]
+                                        ) {
                                             if ($s3) {
                                                 $this->S3Transfer->delete($basePath);
                                             } else {
